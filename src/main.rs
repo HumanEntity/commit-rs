@@ -1,7 +1,9 @@
 use std::fmt::Display;
 
 use color_eyre::eyre::Result;
-use dialoguer::{theme::ColorfulTheme, Confirm, FuzzySelect, Input, MultiSelect, Select};
+use dialoguer::{theme::ColorfulTheme, Confirm, Editor, FuzzySelect, Input, MultiSelect, Select};
+
+use crate::issue::Issue;
 
 pub const MAX_SHORT_DESC: usize = 50;
 
@@ -51,10 +53,10 @@ fn main() -> Result<()> {
         CommitType::Chore,
     ];
 
-    let commit_type = FuzzySelect::with_theme(&ColorfulTheme::default())
+    let commit_type = items[FuzzySelect::with_theme(&ColorfulTheme::default())
         .with_prompt("Select type of change you're committing:")
         .items(items)
-        .interact()?;
+        .interact()?];
 
     let scope: String = Input::with_theme(&ColorfulTheme::default())
         .with_prompt("What the scope of change:")
@@ -85,6 +87,28 @@ fn main() -> Result<()> {
         .default(false)
         .with_prompt("Does this change affect any issue?")
         .interact()?;
+
+    let issue = if affected_issue {
+        Issue::new(&ColorfulTheme::default())?.to_string()
+    } else {
+        "".to_string()
+    };
+
+    // Format commit message
+    let message = format!(
+        "{}({scope}): {short_desc}\n\n{long_desc}\n\n{issue}\n{}",
+        // Commit type
+        commit_type.to_string().splitn(2, ':').collect::<Vec<_>>()[0],
+        // Breaking changes
+        if breaking_changes {
+            let message = Editor::new().edit("Breaking change description")?.unwrap();
+            format!("BREAKING CHANGE: {message}")
+        } else {
+            "".to_string()
+        }
+    );
+
+    println!("{message}");
 
     Ok(())
 }
