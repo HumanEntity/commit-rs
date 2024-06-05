@@ -5,6 +5,8 @@ use dialoguer::{theme::ColorfulTheme, Confirm, FuzzySelect, Input, MultiSelect, 
 
 pub const MAX_SHORT_DESC: usize = 50;
 
+pub mod issue;
+
 #[derive(Debug, Clone, Copy)]
 pub enum CommitType {
     Feature,
