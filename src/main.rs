@@ -2,6 +2,7 @@ use std::fmt::Display;
 
 use color_eyre::eyre::Result;
 use dialoguer::{theme::ColorfulTheme, Confirm, Editor, FuzzySelect, Input, MultiSelect, Select};
+use git2::{Commit, Repository};
 
 use crate::issue::Issue;
 
@@ -109,6 +110,30 @@ fn main() -> Result<()> {
     );
 
     println!("{message}");
+
+    let repo = Repository::open(std::env::current_dir()?)?;
+    let user_signature = repo.signature()?;
+
+    let mut index = repo.index()?;
+    let tree = repo.find_tree(index.write_tree()?)?;
+
+    let parent = repo.head().map(|x| x.target().map(|x| repo.find_commit(x)));
+
+    let parent_full: &[&Commit] = if let Ok(Some(commit)) = parent {
+        &[&commit?]
+    } else {
+        &[]
+    };
+
+    let commit_id = repo.commit(
+        Some("HEAD"),
+        &user_signature,
+        &user_signature,
+        &message,
+        &tree,
+        parent_full,
+    )?;
+    println!("Commit id: {commit_id}");
 
     Ok(())
 }
