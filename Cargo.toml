@@ -8,6 +8,10 @@ license = "MIT OR Apache-2.0"
 name = "cr"
 path = "src/main.rs"
 
+[[bin]]
+name = "git-cr"
+path = "src/main.rs"
+
 [dependencies]
 color-eyre = "0.6.3"
 dialoguer = { version = "0.11.0", features = ["editor", "fuzzy-select"] }
