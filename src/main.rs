@@ -42,7 +42,6 @@ impl Display for CommitType {
 }
 
 fn main() -> Result<()> {
-    println!("Hello, world!");
     let items = &[
         CommitType::Feature,
         CommitType::Fix,
