@@ -2,7 +2,7 @@ use std::fmt::Display;
 
 use color_eyre::eyre::Result;
 use dialoguer::{theme::ColorfulTheme, Confirm, Editor, FuzzySelect, Input};
-use git2::{Commit, Repository, StatusOptions};
+use git2::{Commit, Repository, RepositoryOpenFlags, StatusOptions};
 
 use crate::issue::Issue;
 
@@ -42,7 +42,11 @@ impl Display for CommitType {
 }
 
 fn main() -> Result<()> {
-    let repo = Repository::open(std::env::current_dir()?)?;
+    let repo = Repository::open_ext(
+        std::env::current_dir()?,
+        RepositoryOpenFlags::empty(),
+        &[] as &[&std::ffi::OsStr],
+    )?;
     let user_signature = repo.signature()?;
 
     let statuses = repo.statuses(Some(StatusOptions::new().show(git2::StatusShow::Index)))?;
