@@ -2,7 +2,7 @@ use std::fmt::Display;
 
 use color_eyre::eyre::Result;
 use dialoguer::{theme::ColorfulTheme, Confirm, Editor, FuzzySelect, Input, MultiSelect, Select};
-use git2::{Commit, Repository};
+use git2::{Commit, Repository, StatusOptions};
 
 use crate::issue::Issue;
 
@@ -42,6 +42,21 @@ impl Display for CommitType {
 }
 
 fn main() -> Result<()> {
+    let repo = Repository::open(std::env::current_dir()?)?;
+    let user_signature = repo.signature()?;
+
+    let statuses = repo.statuses(Some(StatusOptions::new().show(git2::StatusShow::Index)))?;
+
+    let is_staged_files = statuses
+        .iter()
+        .map(|e| e.head_to_index())
+        .any(|x| x.is_some());
+
+    if !is_staged_files {
+        return Ok(());
+    }
+
+    // Get data
     let items = &[
         CommitType::Feature,
         CommitType::Fix,
@@ -109,9 +124,6 @@ fn main() -> Result<()> {
     );
 
     println!("{message}");
-
-    let repo = Repository::open(std::env::current_dir()?)?;
-    let user_signature = repo.signature()?;
 
     let mut index = repo.index()?;
     let tree = repo.find_tree(index.write_tree()?)?;
