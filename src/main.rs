@@ -1,7 +1,7 @@
 use std::fmt::Display;
 
 use color_eyre::eyre::Result;
-use dialoguer::{theme::ColorfulTheme, Confirm, Editor, FuzzySelect, Input, MultiSelect, Select};
+use dialoguer::{theme::ColorfulTheme, Confirm, Editor, FuzzySelect, Input};
 use git2::{Commit, Repository, StatusOptions};
 
 use crate::issue::Issue;
