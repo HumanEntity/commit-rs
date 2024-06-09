@@ -25,3 +25,7 @@ cargo install --path .
 Go to your repo, stage something and run `git cr` or `cr`.
 
 ![Example usage screenshot](/assets/screenshot.jpg)
+
+## Usage
+
+Run `git cr` and follow the instructions.
