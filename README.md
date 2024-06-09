@@ -6,6 +6,10 @@
 
 </div>
 
+## Description
+
+`commit-rs` is simple utility for committing your changes using [conventional commits](https://www.conventionalcommits.org)
+
 ## Installation
 
 `commit-rs` isn't published to [crates.io](https://crates.io) yet so you have to install it manually like so.
