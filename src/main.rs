@@ -57,6 +57,7 @@ fn main() -> Result<()> {
         .any(|x| x.is_some());
 
     if !is_staged_files {
+        println!("Empty worktree");
         return Ok(());
     }
 
