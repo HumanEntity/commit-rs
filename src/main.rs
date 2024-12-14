@@ -1,7 +1,7 @@
 use std::fmt::Display;
 
 use color_eyre::eyre::Result;
-use dialoguer::{theme::ColorfulTheme, Confirm, Editor, FuzzySelect, Input};
+use dialoguer::{console::Style, theme::ColorfulTheme, Confirm, Editor, FuzzySelect, Input};
 use git2::{Commit, Repository, RepositoryOpenFlags, StatusOptions};
 
 use crate::issue::Issue;
@@ -61,6 +61,14 @@ fn main() -> Result<()> {
         return Ok(());
     }
 
+    let theme = ColorfulTheme {
+        prompt_style: Style::new().white(),
+        defaults_style: Style::new().dim(),
+        active_item_style: Style::new().yellow().italic(),
+        inactive_item_style: Style::new().black(),
+        ..Default::default()
+    };
+
     // Get data
     let items = &[
         CommitType::Feature,
@@ -73,16 +81,16 @@ fn main() -> Result<()> {
         CommitType::Chore,
     ];
 
-    let commit_type = items[FuzzySelect::with_theme(&ColorfulTheme::default())
+    let commit_type = items[FuzzySelect::with_theme(&theme)
         .with_prompt("Select type of change you're committing:")
         .items(items)
         .interact()?];
 
-    let scope: String = Input::with_theme(&ColorfulTheme::default())
+    let scope: String = Input::with_theme(&theme)
         .with_prompt("What the scope of change:")
         .interact_text()?;
 
-    let short_desc: String = Input::with_theme(&ColorfulTheme::default())
+    let short_desc: String = Input::with_theme(&theme)
         .with_prompt(format!("Short desc (max {MAX_SHORT_DESC} chars)"))
         .validate_with(|x: &String| {
             if x.len() <= MAX_SHORT_DESC {
@@ -93,23 +101,23 @@ fn main() -> Result<()> {
         })
         .interact_text()?;
 
-    let long_desc: String = Input::with_theme(&ColorfulTheme::default())
+    let long_desc: String = Input::with_theme(&theme)
         .with_prompt("Provide long description of the change: (empty to skip)")
         .allow_empty(true)
         .interact_text()?;
 
-    let breaking_changes: bool = Confirm::with_theme(&ColorfulTheme::default())
+    let breaking_changes: bool = Confirm::with_theme(&theme)
         .default(false)
         .with_prompt("Are there any breaking changes?")
         .interact()?;
 
-    let affected_issue: bool = Confirm::with_theme(&ColorfulTheme::default())
+    let affected_issue: bool = Confirm::with_theme(&theme)
         .default(false)
         .with_prompt("Does this change affect any issue?")
         .interact()?;
 
     let issue = if affected_issue {
-        Issue::new(&ColorfulTheme::default())?.to_string()
+        Issue::new(&theme)?.to_string()
     } else {
         "".to_string()
     };
