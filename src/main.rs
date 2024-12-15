@@ -6,7 +6,7 @@ use git2::{Commit, Repository, RepositoryOpenFlags, StatusOptions};
 
 use crate::issue::Issue;
 
-pub const MAX_SHORT_DESC: usize = 50;
+pub const MAX_SHORT_DESC: usize = 100;
 
 pub mod issue;
 
@@ -90,10 +90,12 @@ fn main() -> Result<()> {
         .with_prompt("What the scope of change:")
         .interact_text()?;
 
+    let max_length = MAX_SHORT_DESC
+        - (commit_type.to_string().splitn(2, ':').collect::<Vec<_>>()[0].len() + 2 + scope.len());
     let short_desc: String = Input::with_theme(&theme)
-        .with_prompt(format!("Short desc (max {MAX_SHORT_DESC} chars)"))
+        .with_prompt(format!("Short desc (max {max_length} chars)"))
         .validate_with(|x: &String| {
-            if x.len() <= MAX_SHORT_DESC {
+            if x.len() <= max_length {
                 Ok(())
             } else {
                 Err("This message is too long")
